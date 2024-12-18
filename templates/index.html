@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Web Application</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Background gradient */
+        body {
+            background: linear-gradient(to bottom right, skyblue, lightgreen);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        h1, h2 {
+            color: #007bff;
+        }
+
+        .form-group button {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-check {
+            background-color: #17a2b8;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container text-center">
+        <h1 class="mb-4">Blockchain Web Application</h1>
+
+        <!-- Form for adding a new block -->
+        <form action="/add_block" method="POST" id="addBlockForm" class="mb-4">
+            <div class="form-group">
+                <input type="text" name="data" class="form-control" placeholder="Enter data for new block" required>
+            </div>
+            <button type="submit" class="btn btn-success">Add Block</button>
+        </form>
+
+        <!-- Display Blockchain Data -->
+        <h2>Blockchain Data</h2>
+        <pre id="chainData" class="border p-3 rounded bg-light"></pre>
+
+        <!-- Button and section for checking blockchain validity -->
+        <button onclick="checkValidity()" class="btn btn-check mt-3">Check Blockchain Validity</button>
+        <p id="validityStatus" class="mt-3 font-weight-bold"></p>
+
+        <!-- Display Decrypted Blockchain Data -->
+        <h2>Decrypted Blockchain Data</h2>
+        <pre id="decryptedData" class="border p-3 rounded bg-light"></pre>
+    </div>
+
+    <!-- JavaScript for interacting with the blockchain -->
+    <script>
+        // Function to handle adding a new block
+        document.getElementById('addBlockForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = await fetch('/add_block', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            alert(result.message);
+            loadChain();
+            checkValidity();
+            loadDecryptedChain();
+        };
+
+        // Function to load the entire blockchain data
+        async function loadChain() {
+            const response = await fetch('/get_chain');
+            const chain = await response.json();
+            document.getElementById('chainData').textContent = JSON.stringify(chain, null, 2);
+        }
+
+        // Function to check blockchain validity
+        async function checkValidity() {
+            const response = await fetch('/is_valid');
+            const result = await response.json();
+            document.getElementById('validityStatus').textContent = "Blockchain is valid: " + result.is_valid;
+        }
+
+        // Function to load decrypted blockchain data
+        async function loadDecryptedChain() {
+            const response = await fetch('/decrypted_chain');
+            const decryptedData = await response.json();
+            document.getElementById('decryptedData').textContent = JSON.stringify(decryptedData, null, 2);
+        }
+
+        // Load initial data on page load
+        loadChain();
+        loadDecryptedChain();
+    </script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
